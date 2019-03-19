@@ -13,7 +13,7 @@ const placegroundScenePipelineModule = () => {
 
     const raycaster = new THREE.Raycaster()
     const tapPosition = new THREE.Vector2()
-    const loader = new THREE.FBXLoader; //
+
 
     let surface  // Transparent surface for raycasting for object placement.
 
@@ -46,36 +46,41 @@ const placegroundScenePipelineModule = () => {
         console.log(`animateIn: ${pointX}, ${pointZ}, ${yDegrees}`)
         const scale = Object.assign({}, startScale)
 
-        model.scene.rotation.set(0.0, yDegrees, 0.0)
-        model.scene.position.set(pointX, 0.0, pointZ)
-        model.scene.scale.set(scale.x, scale.y, scale.z)
-        XR.Threejs.xrScene().scene.add(model.scene)
+        // model.scene.rotation.set(0.0, yDegrees, 0.0)
+        // model.scene.position.set(pointX, 0.0, pointZ)
+        // model.scene.scale.set(scale.x, scale.y, scale.z)
+        XR.Threejs.xrScene().scene.add(model)
 
-        new TWEEN.Tween(scale)
-            .to(endScale, animationMillis)
-            .easing(TWEEN.Easing.Elastic.Out) // Use an easing function to make the animation smooth.
-            .onUpdate(() => {
-                model.scene.scale.set(scale.x, scale.y, scale.z)
-            })
-            .start() // Start the tween immediately.
-    }
+        // new TWEEN.Tween(scale)
+        //     .to(endScale, animationMillis)
+        //     .easing(TWEEN.Easing.Elastic.Out) // Use an easing function to make the animation smooth.
+        //     .onUpdate(() => {
+        //         model.scene.scale.set(scale.x, scale.y, scale.z)
+        //     })
+        //     .start() // Start the tween immediately.
+    };
 
     // Load the glb model at the requested point on the surface.
     const placeObject = (pointX, pointZ) => {
-        console.log(`placing at ${pointX}, ${pointZ}`)
-        loader.load(
-            modelSamba,                                                              // resource URL.
-            (model) => {
-                animateIn(model, pointX, pointZ, Math.random() * 360)
-            },     // loaded handler.
-            (xhr) => {
-                console.log(`${(xhr.loaded / xhr.total * 100)}% loaded`)
-            },   // progress handler.
-            (error) => {
-                console.log('An error happened')
-            }                           // error handler.
-        )
-    }
+        let loader = new THREE.FBXLoader();
+        loader.load(modelSamba, (model) => {
+            animateIn(model, pointX, pointZ, Math.random() * 360)
+        });
+
+        // console.log(`placing at ${pointX}, ${pointZ}`)
+        // loader.load(
+        //     modelSamba,                                                              // resource URL.
+        //     (model) => {
+        //         animateIn(gltf, pointX, pointZ, Math.random() * 360)
+        //     },     // loaded handler.
+        //     (xhr) => {
+        //         console.log(`${(xhr.loaded / xhr.total * 100)}% loaded`)
+        //     },   // progress handler.
+        //     (error) => {
+        //         console.log('An error happened')
+        //     }                           // error handler.
+        // )
+    };
 
     const placeObjectTouchHandler = (e) => {
         console.log('placeObjectTouchHandler')
