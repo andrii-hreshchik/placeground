@@ -8,18 +8,21 @@ const placegroundScenePipelineModule = () => {
     const endScale = new THREE.Vector3(0.002, 0.002, 0.002)      // Ending scale value for our model
     const animationMillis = 750                                  // Animate over 0.75 seconds
 
+
+    const modelSamba = 'Samba Dancing.fbx';
+
     const raycaster = new THREE.Raycaster()
     const tapPosition = new THREE.Vector2()
-    const loader = new THREE.GLTFLoader()  // This comes from GLTFLoader.js.
+    const loader = new THREE.FBXLoader; //
 
     let surface  // Transparent surface for raycasting for object placement.
 
     // Populates some object into an XR scene and sets the initial camera position. The scene and
     // camera come from xr3js, and are only available in the camera loop lifecycle onStart() or later.
-    const initXrScene = ({ scene, camera }) => {
+    const initXrScene = ({scene, camera}) => {
         console.log('initXrScene')
         surface = new THREE.Mesh(
-            new THREE.PlaneGeometry( 100, 100, 1, 1 ),
+            new THREE.PlaneGeometry(100, 100, 1, 1),
             new THREE.MeshBasicMaterial({
                 color: 0xffff00,
                 transparent: true,
@@ -32,7 +35,7 @@ const placegroundScenePipelineModule = () => {
         surface.position.set(0, 0, 0)
         scene.add(surface)
 
-        scene.add(new THREE.AmbientLight( 0x404040, 5 ))  // Add soft white light to the scene.
+        scene.add(new THREE.AmbientLight(0x404040, 5))  // Add soft white light to the scene.
 
         // Set the initial camera position relative to the scene we just laid out. This must be at a
         // height greater than y=0.
@@ -51,7 +54,9 @@ const placegroundScenePipelineModule = () => {
         new TWEEN.Tween(scale)
             .to(endScale, animationMillis)
             .easing(TWEEN.Easing.Elastic.Out) // Use an easing function to make the animation smooth.
-            .onUpdate(() => { model.scene.scale.set(scale.x, scale.y, scale.z) })
+            .onUpdate(() => {
+                model.scene.scale.set(scale.x, scale.y, scale.z)
+            })
             .start() // Start the tween immediately.
     }
 
@@ -59,10 +64,16 @@ const placegroundScenePipelineModule = () => {
     const placeObject = (pointX, pointZ) => {
         console.log(`placing at ${pointX}, ${pointZ}`)
         loader.load(
-            modelFile,                                                              // resource URL.
-            (gltf) => { animateIn(gltf, pointX, pointZ, Math.random() * 360) },     // loaded handler.
-            (xhr) => {console.log(`${(xhr.loaded / xhr.total * 100 )}% loaded`)},   // progress handler.
-            (error) => {console.log('An error happened')}                           // error handler.
+            modelSamba,                                                              // resource URL.
+            (model) => {
+                animateIn(model, pointX, pointZ, Math.random() * 360)
+            },     // loaded handler.
+            (xhr) => {
+                console.log(`${(xhr.loaded / xhr.total * 100)}% loaded`)
+            },   // progress handler.
+            (error) => {
+                console.log('An error happened')
+            }                           // error handler.
         )
     }
 
@@ -83,7 +94,7 @@ const placegroundScenePipelineModule = () => {
 
         // calculate tap position in normalized device coordinates (-1 to +1) for both components.
         tapPosition.x = (e.touches[0].clientX / window.innerWidth) * 2 - 1
-        tapPosition.y = - (e.touches[0].clientY / window.innerHeight) * 2 + 1
+        tapPosition.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1
 
         // Update the picking ray with the camera and tap position.
         raycaster.setFromCamera(tapPosition, camera)
@@ -106,12 +117,13 @@ const placegroundScenePipelineModule = () => {
         onStart: ({canvas, canvasWidth, canvasHeight}) => {
             const {scene, camera} = XR.Threejs.xrScene()  // Get the 3js sceen from xr3js.
 
-            initXrScene({ scene, camera }) // Add objects to the scene and set starting camera position.
+            initXrScene({scene, camera}) // Add objects to the scene and set starting camera position.
 
             canvas.addEventListener('touchstart', placeObjectTouchHandler, true)  // Add touch listener.
 
             // Enable TWEEN animations.
             animate()
+
             function animate(time) {
                 requestAnimationFrame(animate)
                 TWEEN.update(time)
@@ -145,5 +157,9 @@ const onxrloaded = () => {
 }
 
 // Show loading screen before the full XR library has been loaded.
-const load = () => { XRExtras.Loading.showLoading({onxrloaded}) }
-window.onload = () => { window.XRExtras ? load() : window.addEventListener('xrextrasloaded', load) }
+const load = () => {
+    XRExtras.Loading.showLoading({onxrloaded})
+}
+window.onload = () => {
+    window.XRExtras ? load() : window.addEventListener('xrextrasloaded', load)
+}
