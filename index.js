@@ -35,7 +35,12 @@ const placegroundScenePipelineModule = () => {
         surface.position.set(0, 0, 0)
         scene.add(surface)
 
-        scene.add(new THREE.AmbientLight(0x404040, 5))  // Add soft white light to the scene.
+        scene.add(new THREE.AmbientLight(0x404040, 5))
+        let loader = new THREE.FBXLoader();
+        loader.load(modelSamba, (model) => {
+            scene.add(model);
+        });
+// Add soft white light to the scene.
 
         // Set the initial camera position relative to the scene we just laid out. This must be at a
         // height greater than y=0.
@@ -49,7 +54,7 @@ const placegroundScenePipelineModule = () => {
         // model.scene.rotation.set(0.0, yDegrees, 0.0)
         // model.scene.position.set(pointX, 0.0, pointZ)
         // model.scene.scale.set(scale.x, scale.y, scale.z)
-        XR.Threejs.xrScene().scene.add(model)
+        // XR.Threejs.xrScene().scene.add(model)
 
         // new TWEEN.Tween(scale)
         //     .to(endScale, animationMillis)
@@ -62,10 +67,10 @@ const placegroundScenePipelineModule = () => {
 
     // Load the glb model at the requested point on the surface.
     const placeObject = (pointX, pointZ) => {
-        let loader = new THREE.FBXLoader();
-        loader.load(modelSamba, (model) => {
-            animateIn(model, pointX, pointZ, Math.random() * 360)
-        });
+        // let loader = new THREE.FBXLoader();
+        // loader.load(modelSamba, (model) => {
+        //     animateIn(model, pointX, pointZ, Math.random() * 360)
+        // });
 
         // console.log(`placing at ${pointX}, ${pointZ}`)
         // loader.load(
